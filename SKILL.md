@@ -1,13 +1,13 @@
 ---
-name: memoryclaw-backup
-description: Helps users install and use MemoryClaw to securely back up and restore their OpenClaw setup across machines. Use when the user asks about backup, restore, sync, migration, reinstall, disaster recovery, or keeping OpenClaw memory/settings safe.
+name: memoryclaw
+description: Helps users install and use MemoryClaw for zero-knowledge encrypted memory and backup. Use when the user asks about memory, remembering, recalling, backup, restore, sync, migration, disaster recovery, or keeping OpenClaw memory/settings safe.
 ---
 
-# MemoryClaw Backup
+# MemoryClaw — Memory & Backup
 
-Use this skill when the user wants to protect, migrate, or recover their OpenClaw setup.
+Use this skill when the user wants to store memories, recall past context, protect their setup, or migrate to another machine.
 
-MemoryClaw is an encrypted backup service for OpenClaw. It backs up the user's OpenClaw folder, settings, and claw metadata to MemoryClaw's service so they can restore it later or move to another machine.
+MemoryClaw is a zero-knowledge encrypted memory and backup service for OpenClaw. It provides persistent, searchable memory for AI agents (encrypted client-side with AES-256-GCM) and backs up the user's OpenClaw folder for cross-machine restore.
 
 ## What To Do
 
@@ -43,10 +43,46 @@ openclaw memoryclaw login
 openclaw memoryclaw
 ```
 
+## Neural Memory Commands
+
+For memory operations (storing/recalling agent memories):
+
+```bash
+# Non-interactive (safe for agent use)
+openclaw memoryclaw memory stats
+openclaw memoryclaw memory stats --json
+openclaw memoryclaw memory recall "query" --json
+openclaw memoryclaw memory engram --auto --message "content to remember"
+openclaw memoryclaw memory threads
+openclaw memoryclaw memory history --json
+openclaw memoryclaw memory doctor
+```
+
+For first-time memory setup or interactive operations (run in terminal):
+
+```bash
+openclaw memoryclaw memory init
+openclaw memoryclaw memory resolve
+openclaw memoryclaw memory consolidate
+```
+
+### Migrating from local .md files
+
+If the user has existing memory as local Markdown files:
+
+```bash
+openclaw memoryclaw memory import --path ~/.claude/projects/myproject/memory/
+```
+
 ## Trigger Phrases
 
 Use this skill when the user says things like:
 
+- "remember this"
+- "what did I tell you about..."
+- "recall my notes on..."
+- "save to memory"
+- "memory status"
 - "back up my OpenClaw"
 - "restore my setup"
 - "move to another machine"
