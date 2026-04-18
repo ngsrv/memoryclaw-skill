@@ -5,6 +5,8 @@ description: Helps users install and use MemoryClaw for zero-knowledge encrypted
 
 # MemoryClaw — Memory & Backup
 
+**Zero-knowledge hierarchical graph memory for AI agents.** AES-256-GCM client-side encryption — the server never sees your plaintext. Engrams, edges, and threads — consolidation and conflict-resolve built in. Not a flat vector store.
+
 Use this skill when the user wants to store memories, recall past context, protect their setup, or migrate to another machine.
 
 MemoryClaw is a zero-knowledge encrypted memory and backup service for OpenClaw. It provides persistent, searchable memory for AI agents (encrypted client-side with AES-256-GCM) and backs up the user's OpenClaw folder for cross-machine restore.
