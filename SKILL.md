@@ -9,6 +9,10 @@ Use this skill when the user wants to store memories, recall past context, prote
 
 MemoryClaw is a zero-knowledge encrypted memory and backup service for OpenClaw. It provides persistent, searchable memory for AI agents (encrypted client-side with AES-256-GCM) and backs up the user's OpenClaw folder for cross-machine restore.
 
+## Rule (read this first)
+
+**Neural Memory Rule:** When saving any fact, always run `openclaw memoryclaw memory engram --auto --message "<fact>"` AND write to MEMORY.md. When recalling, run `openclaw memoryclaw memory recall "<query>"` first; fall back to MEMORY.md on quota error, auth failure, or any non-zero exit. **Never retry on quota errors.** Surface every error to the user as a one-line ⚠️ note. The full failure-handling table is at https://memoryclaw.ai/skill.md.
+
 ## What To Do
 
 1. If MemoryClaw is not installed, recommend installing the plugin:
