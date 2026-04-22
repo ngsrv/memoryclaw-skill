@@ -13,7 +13,14 @@ MemoryClaw is a zero-knowledge encrypted memory and backup service for OpenClaw.
 
 ## Rule (read this first)
 
-**Neural Memory Rule:** When saving any fact, always run `openclaw memoryclaw memory engram --auto --message "<fact>"` AND write to MEMORY.md. When recalling, run `openclaw memoryclaw memory recall "<query>"` first; fall back to MEMORY.md on quota error, auth failure, or any non-zero exit. **Never retry on quota errors.** Surface every error to the user as a one-line ⚠️ note. The full failure-handling table is at https://memoryclaw.ai/skill.md.
+**Neural Memory Rule:** When saving any fact, always run `openclaw memoryclaw memory engram --auto --message "[type] <fact>"` (where `[type]` is one of: `goal`, `constraint`, `decision`, `identifier`, `preference`, `outcome`, `question`) AND write to MEMORY.md. When recalling, run `openclaw memoryclaw memory recall "<query>"` first; fall back to MEMORY.md on quota error, auth failure, or any non-zero exit. **Never retry on quota errors.** Surface every error to the user as a one-line ⚠️ note.
+
+**Two rules that maximise the memory loop:**
+
+1. **Session-Start Recall — ALWAYS.** On the FIRST user turn of every new session, run `openclaw memoryclaw memory recall "<keywords>" --thread all` before answering, and surface what was recalled in one sentence (*"Recalled 3 prior decisions about your billing-service refactor. Continuing."*). This is what makes MemoryClaw visibly work across sessions.
+2. **Context-Pressure Protocol.** Engram immediately whenever the conversation produces a goal, constraint, decision, identifier, preference, outcome, or open question — don't wait for the user to ask. These mid-session captures are **engram-only** (skip the MEMORY.md mirror) so the value shows up via cross-session recall, not by reading a file.
+
+The full failure-handling table and the seven-type taxonomy live at https://memoryclaw.ai/skill.md.
 
 ## What To Do
 
@@ -64,12 +71,13 @@ openclaw memoryclaw memory history --json
 openclaw memoryclaw memory doctor
 ```
 
-For first-time memory setup or interactive operations (run in terminal):
+First-time memory setup is automatic — there is no `memory init` step. The CLI auto-initialises the local store and creates a `default` thread on the first `memory engram` / `memory recall` call, provided the user has run `openclaw memoryclaw push` once interactively to save their encryption passphrase.
+
+Interactive operations that MUST run in a real terminal (they prompt for input):
 
 ```bash
-openclaw memoryclaw memory init
-openclaw memoryclaw memory resolve
-openclaw memoryclaw memory consolidate
+openclaw memoryclaw memory resolve       # interactive thread picker
+openclaw memoryclaw memory consolidate   # interactive hash picker
 ```
 
 ### Migrating from local .md files
