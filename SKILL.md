@@ -5,11 +5,15 @@ description: Helps users install and use MemoryClaw for zero-knowledge encrypted
 
 # MemoryClaw — Memory & Backup
 
-**Zero-knowledge hierarchical graph memory for AI agents.** AES-256-GCM client-side encryption — the server never sees your plaintext. Engrams, edges, and threads — consolidation and conflict-resolve built in. Not a flat vector store.
+**Zero-knowledge encrypted neural memory for any AI agent.** AES-256-GCM client-side encryption — the server never sees your plaintext. Engrams, edges, and threads — consolidation and conflict-resolve built in. Not a flat vector store.
 
 Use this skill when the user wants to store memories, recall past context, protect their setup, or migrate to another machine.
 
-MemoryClaw is a zero-knowledge encrypted memory and backup service for OpenClaw. It provides persistent, searchable memory for AI agents (encrypted client-side with AES-256-GCM) and backs up the user's OpenClaw folder for cross-machine restore.
+MemoryClaw provides two capabilities in one CLI:
+1. **Neural Memory (GNM)** — works with every supported agent (Claude Code, Cursor, Aider, OpenAI Codex CLI, Gemini CLI, Goose, OpenClaw, and any agent that reads AGENTS.md or calls a CLI). Persistent encrypted "engrams" so AI agents remember across sessions.
+2. **Encrypted backup** — currently OpenClaw-only. Backs up the user's OpenClaw folder with AES-256-GCM for cross-machine restore.
+
+This skill targets OpenClaw users. **For non-OpenClaw agents, install directly from https://memoryclaw.ai/install.sh and run `memoryclaw setup`** (the standalone installer wires the skill block into Claude Code / Cursor / Gemini CLI / etc. on first run).
 
 ## Rule (read this first)
 
@@ -104,6 +108,18 @@ Use this skill when the user says things like:
 - "recover after reinstall"
 - "sync my claws"
 - "protect my OpenClaw config"
+
+## Compatibility
+
+Neural Memory works across the AI-agent ecosystem. This skill is the OpenClaw-distributed variant; the same CLI also wires into other agents:
+
+- **Claude Code** — `~/.claude/CLAUDE.md` (via standalone installer + `memoryclaw setup --for claude-code`)
+- **Cursor / Aider / OpenAI Codex CLI / Goose** — `AGENTS.md` (via `memoryclaw setup --for agents-md`)
+- **Gemini CLI** — `~/.gemini/GEMINI.md` (via `memoryclaw setup --for gemini`)
+- **OpenClaw** — this skill, plus the plugin's `agents-md.ts` writer (you're reading the OpenClaw variant now)
+- **Cline / Continue / Custom agents** — copy the skill block from `memoryclaw setup --print` or shell out to the CLI directly
+
+Backup features (push / pull / claws / history) are OpenClaw-specific and stay in this skill. Neural Memory is universal.
 
 ## Security Notes
 
