@@ -278,9 +278,26 @@ The Recall-First and Auto-Engram protocols below will be tempting to skip. The b
 
 ### Where this is enforced mechanically
 
-**Inside Claude Code (≥ memoryclaw plugin v1.1.0):** the plugin ships hooks that auto-recall on session start + every user prompt and auto-engram any sentence in your response prefixed with one of the seven type tags (`[goal]`, `[constraint]`, `[decision]`, `[identifier]`, `[preference]`, `[outcome]`, `[question]`). You'll see recall results injected as `additionalContext`. The protocol enforces itself.
+The recall + engram protocol can run as **shell hooks** that fire automatically on the host agent's lifecycle events. Coverage as of MemoryClaw v1.2.0 (verified 2026-04-25 via per-platform deep audit):
 
-**Inside any other agent** (Cursor, Aider, Codex CLI, Gemini CLI, Goose, OpenClaw, custom): no equivalent hook system exists today. The protocol below is fully your responsibility — there is no safety net. That is why the rules are spelled out as imperatives ("ALWAYS", "BEFORE", "NEVER"). Treat them that way.
+| Agent | Hook events used | Setup |
+|---|---|---|
+| **Claude Code** | `SessionStart` / `UserPromptSubmit` / `Stop` | Plugin v1.1.0+ — `claude plugin install ngsrv/memoryclaw` |
+| **OpenAI Codex CLI** | `SessionStart` / `UserPromptSubmit` / `Stop` (1:1 port from Claude Code) | `memoryclaw setup --for codex` — writes `~/.codex/hooks.json` + toggles `[features] codex_hooks = true` in `~/.codex/config.toml` |
+| **Cursor** (≥ 1.7) | `sessionStart` / `afterAgentResponse` / `stop` | `memoryclaw setup --for cursor` — writes `~/.cursor/hooks.json`. Per-prompt recall not possible (`beforeSubmitPrompt` is observe-only); session-start + auto-engram shipped |
+| **Gemini CLI** (≥ v0.26.0) | `SessionStart` / `BeforeAgent` / `AfterAgent` | `memoryclaw setup --for gemini` — writes `~/.gemini/settings.json` hooks |
+| **OpenClaw** | `before_prompt_build` (recall → `prependContext`) / `agent_end` (engram scan) — typed against OpenClaw plugin SDK ≥ 2026.4.15 | Auto-installed when the OpenClaw plugin loads (no separate setup step) |
+| **Aider** | **none** — PR #4485 (pre/post handlers) was closed | Text-only enforcement. Protocol is fully your responsibility |
+| **Goose** | **none** — MCP-only (extensions can register tools but not subscribe to lifecycle events) | Text-only enforcement |
+| **Custom integrations** (LangChain, OpenAI SDK, your own scripts) | Whatever you wire | You're the implementer — the recall + engram protocol applies the same way; just call the CLI from your loop |
+
+When hooks are wired, you'll see recall results injected into your context as `additionalContext` (or the platform's equivalent — Cursor calls it `additional_context`, Gemini's name varies). Engrams happen as a side effect of including a `[type]` tag in your response — the Stop hook scans the transcript and saves them. **The protocol enforces itself** in those four agents.
+
+When hooks aren't available (Aider, Goose, custom integrations), the protocol below is fully your responsibility — there is no safety net. That is why the rules are spelled out as imperatives ("ALWAYS", "BEFORE", "NEVER"). Treat them that way.
+
+All hooks: opt-out via `MEMORYCLAW_AUTO_HOOKS=off`; silent-skip when the `memoryclaw` CLI isn't on `PATH`; time-bounded (4–5s timeout per call); defensive failure (a hook never crashes a session — exit 0 + emit `{}` on any error).
+
+**Doctor coverage (v1.2.0):** `memoryclaw doctor --agents` currently checks only the markdown-block surfaces (AGENTS.md, CLAUDE.md, GEMINI.md, Claude Code Skill plugin). It does NOT yet introspect ~/.codex/hooks.json, ~/.cursor/hooks.json, or the ~/.gemini/settings.json hooks key — that extension lands in v1.3.0. For v1.2.0, verify hook installation manually: `cat ~/.codex/hooks.json`, `cat ~/.cursor/hooks.json`, `jq .hooks ~/.gemini/settings.json`.
 
 If you suspect you bypassed the protocol in a session, engram the bypass itself: `memoryclaw memory engram --auto --message "[outcome] bypassed recall in session ending YYYY-MM-DD because <honest reason>"`. This gives the user a feedback loop on bypass patterns they can review.
 
