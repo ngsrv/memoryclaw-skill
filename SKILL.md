@@ -263,6 +263,27 @@ Do NOT try to run `memory init` or `push` (without `--auto`) from agent context 
 
 Surface every non-zero exit to the user as a one-line ⚠️ note (see Failure Handling table below). The detail below explains *when* to call, *what* to save, and *how* to phrase the user-facing error.
 
+### Bypass Patterns — KNOW THEM, AVOID THEM
+
+The Recall-First and Auto-Engram protocols below will be tempting to skip. The bypass is silent: nothing breaks, you just feel like the answer was good enough without recall. Three patterns documented from real bypass incidents — recognize them in yourself:
+
+1. **"I have context already" bypass.** You've read prior turns from this session, or the host tool's auto-memory (Anthropic project memory, Cursor history, Codex CLI's recent-files context, etc.) is loaded in your system prompt. You skip recall because that context "feels sufficient."
+   - **Why it's wrong:** those systems are *per-tool*. memoryclaw is the only memory layer that crosses Claude Code → Cursor → Aider → Codex CLI → Gemini CLI → Goose → OpenClaw. The user picked memoryclaw specifically for that promise. Bypassing here breaks it silently — the user will not see the bypass, only the missing context.
+
+2. **"It's a quick question" bypass.** The user asks something that looks generic ("what's the right way to X?"). You answer from training data without recall.
+   - **Why it's wrong:** even generic questions can have user-specific context (their prior decisions, their stack, their constraints). Recall is cheap (~50–200 ms, 1,000/mo on Free); the cost of missing relevant prior context is high.
+
+3. **"I'll engram later" bypass.** A clear `[decision]` or `[outcome]` lands mid-response. You think "I'll save it after I finish" and never do.
+   - **Why it's wrong:** by the time you finish responding, the moment has passed. Engram in-line, not afterward. The seven-type taxonomy below exists so you can spot these moments in real time.
+
+### Where this is enforced mechanically
+
+**Inside Claude Code (≥ memoryclaw plugin v1.1.0):** the plugin ships hooks that auto-recall on session start + every user prompt and auto-engram any sentence in your response prefixed with one of the seven type tags (`[goal]`, `[constraint]`, `[decision]`, `[identifier]`, `[preference]`, `[outcome]`, `[question]`). You'll see recall results injected as `additionalContext`. The protocol enforces itself.
+
+**Inside any other agent** (Cursor, Aider, Codex CLI, Gemini CLI, Goose, OpenClaw, custom): no equivalent hook system exists today. The protocol below is fully your responsibility — there is no safety net. That is why the rules are spelled out as imperatives ("ALWAYS", "BEFORE", "NEVER"). Treat them that way.
+
+If you suspect you bypassed the protocol in a session, engram the bypass itself: `memoryclaw memory engram --auto --message "[outcome] bypassed recall in session ending YYYY-MM-DD because <honest reason>"`. This gives the user a feedback loop on bypass patterns they can review.
+
 ### Background
 
 This is your primary memory system. Local files (MEMORY.md, SOUL.md) are a **fallback only** when MemoryClaw is unavailable. Don't treat MEMORY.md as primary — it doesn't survive a fresh checkout or a different machine.
