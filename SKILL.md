@@ -501,6 +501,11 @@ Multi-claw is part of MemoryClaw's **backup feature**, which works with any supp
 
 MemoryClaw supports multiple agent installs across different machines. Each (machine, agent) tuple gets its own claw with separate backup history. With `MEMORYCLAW_MULTI_AGENT_BACKUP=1` set, `push --auto` iterates every registered claw on each cron tick (per-claw `--skip-auto` to opt out individually).
 
+Manage claws with the `backup` subcommand:
+- `memoryclaw backup list` — show every registered claw + its agent + target dir (read-only, no auth, honours `--json`).
+- `memoryclaw backup add` — interactive picker that detects installed agents (Claude Code, Cursor, Codex CLI, Gemini CLI, Aider, Goose, OpenClaw) and registers a claw for the chosen one. Pass `--agent <id>` to skip the picker. One-time consent prompt fires for agents whose home dir holds API keys / OAuth tokens (claude-code, codex-cli, gemini-cli, goose); the prompt names what's at stake. Refuses to add a duplicate (one (machine, agent) per device.json).
+- `memoryclaw backup remove` — interactive picker, two-step confirm, local removal only. Server-side backups stay safe (delete from the dashboard if needed). Refuses to remove the last openclaw claw.
+
 ### How it works
 
 - Each machine automatically gets a unique claw ID and name (e.g., "macbook-pro-arm64") on first push
