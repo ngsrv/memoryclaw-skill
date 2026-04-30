@@ -12,7 +12,7 @@ user-invocable: true
 
 Two capabilities in one CLI:
 1. **Neural Memory (GNM)** — works with every supported agent. Store and recall persistent encrypted "engrams" so your AI remembers across sessions. Zero-knowledge: server stores ciphertext only, never sees content.
-2. **Encrypted backup** — currently OpenClaw-only. Backs up your OpenClaw folder with AES-256-GCM. Non-OpenClaw users install with `MEMORYCLAW_MODE=memory` and skip this entirely.
+2. **Encrypted backup** — works with any supported agent (Claude Code, Cursor, Codex CLI, Gemini CLI, Aider, Goose, OpenClaw). Backs up the agent's home dir (skills, settings, credentials) with AES-256-GCM client-side. Pick which agents to back up at install or via `memoryclaw mode --set full`; users who only want memory install with `MEMORYCLAW_MODE=memory`.
 
 Invoke as `memoryclaw <command>` after the install script symlinks it into `/usr/local/bin/memoryclaw`. OpenClaw users who installed via `openclaw plugins install clawhub:memoryclaw` can also invoke it as `openclaw memoryclaw <command>`.
 
@@ -497,9 +497,9 @@ The user can view all stored engrams (decrypted in their browser) at https://mem
 
 ## Multi-Claw Support
 
-Multi-claw is part of MemoryClaw's **backup feature**, which is currently OpenClaw-only. If you installed with `MEMORYCLAW_MODE=memory`, the `claws` commands below aren't enabled on your machine — run `memoryclaw mode --set full` to enable them (requires OpenClaw).
+Multi-claw is part of MemoryClaw's **backup feature**, which works with any supported agent (Claude Code, Cursor, Codex CLI, Gemini CLI, Aider, Goose, OpenClaw). If you installed with `MEMORYCLAW_MODE=memory`, the `claws` commands below aren't enabled on your machine — run `memoryclaw mode --set full` to enable them.
 
-MemoryClaw supports multiple OpenClaw instances (claws) across different machines. Each claw gets its own identity and separate backup.
+MemoryClaw supports multiple agent installs across different machines. Each (machine, agent) tuple gets its own claw with separate backup history. With `MEMORYCLAW_MULTI_AGENT_BACKUP=1` set, `push --auto` iterates every registered claw on each cron tick (per-claw `--skip-auto` to opt out individually).
 
 ### How it works
 
