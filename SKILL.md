@@ -321,6 +321,8 @@ memoryclaw memory recall "<3-8 keywords from the user's question>"
 
 Never fabricate prior context if both sources are empty.
 
+**Don't refuse a question when recall returned related-but-imprecise hits.** If recall returns engrams that are clearly on-topic but don't directly contain the answer, commit to a specific best-guess from those engrams rather than saying "I don't know" — note the uncertainty (e.g. "based on what I have, probably …") but don't refuse. Refusing on a question whose answer is implied by the recalled context is the most common failure mode; a specific guess that's wrong is recoverable, a refusal teaches the user the memory is useless. Only say "I don't know" when recall is genuinely empty AND MEMORY.md / SOUL.md don't help. (Internal LOCOMO benchmark 2026-05-03: 5 of 7 single-hop fails were "I don't know" refusals where recall actually returned related engrams; banning those refusals lifted mean answer score from 1.90 → 2.55.)
+
 Trigger recall when the user's question:
 - references a person/project/decision/preference (e.g. "what did we decide about X?", "what's my preferred Y?")
 - starts with "remind me", "what's my", "where were we", "continue …"
@@ -396,6 +398,12 @@ The prefix tag is part of the message text — it goes into the engram body, not
 - ✅ `[decision] User chose embeddings + LSH over BPE for the v2 retrieval upgrade.`
 - ❌ `Yes, I'll remember that.` (meta, not the fact, no type)
 - ❌ `What time is the meeting?` (the question, not the answer)
+
+**Date-anchor time-bound engrams.** When the fact is a dated event, decision-on-a-date, or completed milestone, prefix the body with `On <date>,`. Recall against "when did X happen", "what did we decide on Y", or "what was completed before Z" lands reliably when the date is verbatim in the body. (Internal LOCOMO benchmark on 2026-05-03 showed temporal-question pass-rate jumped from 50% → 100% when v2 extractor added this prefix consistently.)
+- ✅ `[outcome] On 2026-05-03, user shipped the v2 extractor + no-refuse answerer to production.`
+- ✅ `[decision] On 2026-04-22, user picked Postgres over Mongo for the v2 retrieval pipeline.`
+- ❌ `[outcome] User shipped the extractor.` (no date — recall on "when" misses)
+- For preferences and identifiers that are timeless (not events), no date prefix needed.
 
 ### Context-Pressure Protocol — engram BEFORE facts fall out of context
 
